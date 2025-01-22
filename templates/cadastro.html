@@ -78,11 +78,27 @@
         $(document).ready(function(){
             $('#deposito').mask('#.##0,00', {reverse: true});
             $('#tele').mask('(00) 00000-0000');
+
+            
+
+            $('form').on('submit', function() { // TENTA DEIXAR O VALOR BONITINHO
+                var valorFormatado = $('#deposito').val();
+                var valorSemFormatacÇao = valorFormatado.replace(/\D/g, '');
+                if (valorFormatado.indexOf(',') === -1) {
+                    valorSemFormataÇao += '00'; // Adiciona centavos se não houver vírgula
+                }
+                $('#valorSemFormatacao').val(valorSemFormataÇao);
+
+                var telefoneFormatado = $('#tele').val();
+                var telefoneSemFormatacao = telefoneFormatado.replace(/\D/g, '');
+                $('#telefoneSemFormatacao').val(telefoneSemFormatacao);
+            });
         });
     </script>
 </head>
 <body>
-    <div class="container-sm">
+    
+    <div class="container-sm" >
         <h2 class="container text-center"><b>Cadastro de Conta</b></h2>
         {% if mensagem %}
         <div class="mensagem">
@@ -100,6 +116,7 @@
                 <button type="submit" class="btn btn-outline-danger">Cadastrar</button><br>
             </div>
         </form>
+        <a href="/">Voltar ao Menu</a>
     </div>
 </body>
 </html>

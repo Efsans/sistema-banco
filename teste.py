@@ -1,6 +1,11 @@
 import html
 from flask import Flask, request, render_template_string
 import os
+import sqlite3
+
+banco = sqlite3.connect('contas.db')
+cursor = banco.cursor()
+cursor.execute('CREATE TABLE IF NOT EXISTS contas (codigo INTEGER PRIMARY KEY, nome TEXT, telefone INTEGER, saldo INTEGER)')
 
 app = Flask(__name__)
 
@@ -17,7 +22,6 @@ def gerar_numero_sequencial(arquivo="contas"):
         numeroF += 1
         numero = f"{numeroF:06d}"
         return numero
-
 
 pag = '''
 <!DOCTYPE html>
@@ -112,7 +116,6 @@ pag = '''
 </html>
 '''
 
-
 @app.route('/')
 def cadastro():
     return render_template_string(pag)
@@ -121,21 +124,18 @@ def cadastro():
 def cadastrar():
     nome = request.form['name']
     telefone = request.form['tele']
-    telefone=int(telefone.replace(")", "").replace("-", "").replace("(", "").replace(" ", ""))
+    telefone = int(telefone.replace(")", "").replace("-", "").replace("(", "").replace(" ", ""))
     saldo = request.form['deposito']
     if not saldo:
         saldo = '000'
     else:
         saldo = saldo.replace(".", "").replace(",", "")
-        saldo = int(saldo)    
+        saldo = int(saldo)
 
-
-    
     numero_gerado = gerar_numero_sequencial()
     
-    with open("contas", "a") as arquiv:
-        line = "%s\t%s\t%d\t%d" % (numero_gerado, nome, telefone, saldo)
-        arquiv.write(f"{line}\n")
+    cursor.execute('INSERT INTO contas (codigo, nome, telefone, saldo) VALUES (?, ?, ?, ?)', (numero_gerado, nome, telefone, saldo))
+    banco.commit()
     
     mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado}. Guarde bem esse número :)"
     return render_template_string(pag, mensagem=mensagem)

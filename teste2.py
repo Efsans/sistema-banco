@@ -4,13 +4,42 @@ import re
 
 app = Flask(__name__)
 
-def get_db_connection():
+def get():
     conn = sqlite3.connect('contas.db')
     conn.row_factory = sqlite3.Row
     return conn
 
+@app.route('/')
+def menu():
+    return render_template('menu.html')
+
+@app.route('/pesquisa')
+def pesquisa():
+    return render_template('pesquisa.html')
+
+@app.route('/pesquisa', methods=['POST'])
+def pesquisar():
+    chack = request.form['conta']
+    conn = get()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM contas WHERE codigo = ?', (chack,))
+    conta = cursor.fetchone()
+    conn.close()
+    
+    if conta:
+        resultado = {
+            'codigo': conta['codigo'],
+            'nome': conta['nome'],
+            'telefone': conta['telefone'],
+            'saldo': conta['saldo'],
+        }
+    else:
+        resultado = "codigo não encontrado"
+    
+    return render_template('pesquisa.html', resultado=resultado)
+
 def gerar_numero_sequencial():
-    conn = get_db_connection()
+    conn = get()
     cursor = conn.cursor()
     cursor.execute('SELECT MAX(codigo) FROM contas')
     max_codigo = cursor.fetchone()[0]
@@ -38,7 +67,7 @@ def cadastrar():
     
     while True:
         numero_gerado = gerar_numero_sequencial()
-        conn = get_db_connection()
+        conn = get()
         cursor = conn.cursor()
         cursor.execute('SELECT 1 FROM contas WHERE codigo = ?', (numero_gerado,))
         if cursor.fetchone() is None:
