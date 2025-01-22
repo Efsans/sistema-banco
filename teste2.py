@@ -66,7 +66,7 @@ def cadastrar():
         saldo = int(saldo)
     
     while True:
-        numero_gerado = gerar_numero_sequencial()
+        numero_gerado = str(gerar_numero_sequencial())
         conn = get()
         cursor = conn.cursor()
         cursor.execute('SELECT 1 FROM contas WHERE codigo = ?', (numero_gerado,))
@@ -78,7 +78,7 @@ def cadastrar():
     conn.commit()
     conn.close()
     
-    mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado}. Guarde bem esse número para que você possa usar bem a sua conta no nosso banco."
+    mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado}. Guarde bem esse número pois por falta de conhecimento e tempo não foi emplementado sistema de login, então para que você possa usar bem a sua conta no nosso banco anote o numero. :) XD :v"
     return render_template('cadastro.html', mensagem=mensagem)
 
 if __name__ == '__main__':
