@@ -81,5 +81,6 @@ def cadastrar():
     mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado}. Guarde bem esse número pois por falta de conhecimento e tempo não foi emplementado sistema de login, então para que você possa usar bem a sua conta no nosso banco anote o numero. :) XD :v"
     return render_template('cadastro.html', mensagem=mensagem)
 
+
 if __name__ == '__main__':
     app.run(debug=True)
