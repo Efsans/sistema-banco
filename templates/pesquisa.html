@@ -67,7 +67,7 @@
             font-size: 8px;
         }
         table, th, td {
-            border: 1px solid black;
+            border: 1px solid white;
     
         }
         th, td {
@@ -82,7 +82,8 @@
     $(document).ready(function(){
         $('#conta').mask('000000');
         $('.formR').mask('#.##0,00', {reverse: true});
-        $('.formT').mask('(00) 00000-0000'); 
+        $('.formT').mask('(00) 00000-0000');
+        $('.formC').mask('00000', {reverse: true}); 
 
     });
 
@@ -114,7 +115,7 @@
                     </tr>
                     
                     <tr>
-                        <td>{{ resultado.codigo }}</td>
+                        <td class="formC">{{ resultado.codigo }}</td>
                         <td>{{ resultado.nome }}</td>
                         <td class="formT" >{{ resultado.telefone }}</td>
                         <td class="formR" >{{ resultado.saldo }}</td>

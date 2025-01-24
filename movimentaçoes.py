@@ -2,9 +2,6 @@ from flask import Flask, request, render_template # type: ignore
 import sqlite3
 import os
 
-conn = sqlite3.connect('contas.db')
-cursor=conn.cursor()
-
 app=Flask(__name__)
 
 def deposito():
@@ -54,7 +51,7 @@ def deposito():
             print("coloque um valor valido")
             continue
         elif transacao == 0:
-            print("valor nulo tranção cancelada ")
+            print("valor nulo trasação cancelada ")
             break
           
 
@@ -66,13 +63,17 @@ def deposito():
 
     
     cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo_origem, codigo1))
+    conn.commit()
     cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo_destino, codigo2))
+    conn.commit()
 
     conn.close()
 
     print(f"Transação de {transacao:.2f} realizada com sucesso!")
     print(f"Novo saldo na conta de origem {cont1[1]}: {saldo_origem:.2f}")
     print(f"Novo saldo na conta de destino {cont2[1]}: {saldo_destino:.2f}")
+
+
 
 if __name__ == "__main__":
     deposito()

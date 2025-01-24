@@ -45,8 +45,9 @@ def gerar_numero_sequencial():
     max_codigo = cursor.fetchone()[0]
     conn.close()
     if max_codigo is None:
-        return "000001"
+        return str('000001')
     else:
+        max_codigo = int(max_codigo)
         return f"{int(max_codigo) + 1:06d}"
 
 @app.route('/cadastro')
@@ -80,6 +81,16 @@ def cadastrar():
     
     mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado}. Guarde bem esse número pois por falta de conhecimento e tempo não foi emplementado sistema de login, então para que você possa usar bem a sua conta no nosso banco anote o numero. :) XD :v"
     return render_template('cadastro.html', mensagem=mensagem)
+
+@app.route("/mov")
+def menu_mov():
+    return render_template('menu_mov.html')
+    
+
+
+
+
+
 
 
 if __name__ == '__main__':
