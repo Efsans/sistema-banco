@@ -4,16 +4,21 @@ import os
 
 app=Flask(__name__)
 
+@app.route('/transferir')
+def transf():
+    return render_template('transfer.html')
+
+@app.route('/transferir', methods=['POST'])
 def deposito():
     conn = sqlite3.connect('contas.db')
     cursor=conn.cursor()
 
-    codigo1 = input("Digite o código da sua conta: ")
-    codigo2 = input("Digite o código da conta de destino: ")
+    codigo1 = request.form['codigo1']
+    codigo2 = request.form['codigo2']
 
     if not os.path.exists('contas.db'):
-        print("Arquivo não encontrado.")
-        return
+        resultado= "Arquivo não encontrado."
+        return render_template('transfer.html', resultado=resultado)
 
     
     cursor.execute('SELECT * FROM  contas WHERE codigo = ?', (codigo1))
@@ -26,23 +31,27 @@ def deposito():
     
     
     if not cont1:
-        print("Conta de origem não encontrada.")
+        resultado="Conta de origem não encontrada."
         conn.close()
-        return
+        return render_template('transfer.html', resultado=resultado)
 
     if not cont2:
-        print("Conta de destino não encontrada.")
+        resultado="Conta de destino não encontrada."
         conn.close()
-        return
+        return render_template('transfer.html', resultado=resultado)
 
     saldo_origem = cont1[3]
     saldo_destino = cont2[3]
     while True:
-        print(f"Saldo na conta de origem {cont1[1]}: {saldo_origem:.2f}")
-        transacao = float(input(f"Valor a ser transferido para {cont2[1]}: ").replace(',', '.'))
+        mensagem=f"Saldo na conta de origem {cont1[1]}: {saldo_origem:.2f}"
+        mensagem2= (f"Valor a ser transferido para {cont2[1]}: ").replace(',', '.')
+        return render_template('transfer.html', mensagem=mensagem, mensagem2=mensagem2)
+        
+        transacao = request.form('valor')
 
-        if transacao < 10.00:
-            print("Valor mínimo para transação é 10,00")
+        
+        if transacao == 0:
+            print("valor nulo trasação cancelada ")
             continue
         elif transacao > saldo_origem:
             print("Saldo insuficiente")
@@ -50,9 +59,9 @@ def deposito():
         elif transacao < 0:
             print("coloque um valor valido")
             continue
-        elif transacao == 0:
-            print("valor nulo trasação cancelada ")
-            break
+        elif transacao < 10.00:
+            print("Valor mínimo para transação é 10,00")
+            
           
 
         else:
@@ -76,4 +85,4 @@ def deposito():
 
 
 if __name__ == "__main__":
-    deposito()
+    app.run(debug=True)

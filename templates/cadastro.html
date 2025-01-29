@@ -93,16 +93,16 @@
         {% endif %}
         <form action="/cadastrar" method="post">
             <label for="name">Nome Completo:<bc class="ver">*</b></label>
-            <input type="text" id="name" name="name" required placeholder="nome completo"><br>
+            <input type="text" id="name" name="name" required placeholder="nome completo" class="form-control"><br>
             <label for="tele">Número de Telefone:<b class="ver">*</b></label>
-            <input type="tel" min="0" id="tele" name="tele" required placeholder="(xx) xxxxx-xxxx"><br>
+            <input type="tel" min="0" id="tele" name="tele" required placeholder="(xx) xxxxx-xxxx" class="form-control"><br>
             <label for="deposito">Valor inicial de deposito:</label>
-            <input type="text" id="deposito" name="deposito" placeholder="digite o valor do deposito" step="0.01" min="0.0"><br>
+            <input type="text" id="deposito" name="deposito" placeholder="digite o valor do deposito" step="0.01" min="0.0" class="form-control"><br>
             <div class= "container text-center">
                 <button type="submit" class="btn btn-outline-danger">Cadastrar</button><br>
             </div>
         </form>
-        <a href="/">Voltar ao Menu</a>
+        <a href="/" class="btn btn-light">Voltar ao Menu</a>
     </div>
 </body>
 </html>
