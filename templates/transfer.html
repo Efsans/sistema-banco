@@ -81,7 +81,7 @@
     <h2><b>Transferir</b></h2>
     {% if resultado %}
     <div class="mensagem">
-        <p class="container text-center">{{ resultado|safe }}</p>
+        <p>{{ resultado|safe }}</p>
     </div>
     {% endif %}
     <form method="POST" action="/transferir">
