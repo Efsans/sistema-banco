@@ -31,7 +31,7 @@ def pesquisar():
             'codigo': conta['codigo'],
             'nome': conta['nome'],
             'telefone': conta['telefone'],
-            'saldo': conta['saldo'],
+            'saldo': f"{conta['saldo'] / 100:.2f}".replace('.', ','),
         }
     else:
         resultado = "codigo não encontrado"
@@ -79,19 +79,134 @@ def cadastrar():
     conn.commit()
     conn.close()
     
-    mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado}. Guarde bem esse número pois por falta de conhecimento e tempo não foi emplementado sistema de login, então para que você possa usar bem a sua conta no nosso banco anote o numero. :) XD :v"
+    mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado}." #Guarde bem esse número pois por falta de conhecimento e tempo não foi emplementado sistema de login, então para que você possa usar bem a sua conta no nosso banco anote o numero. :) XD :v"
     return render_template('cadastro.html', mensagem=mensagem)
 
 @app.route("/mov")
 def menu_mov():
     return render_template('menu_mov.html')
+
+@app.route('/transferir')
+def transf():
+    return render_template('transfer.html')
+
+@app.route('/transferir', methods=['POST'])
+def transferir():
+    conn = get()
+    cursor = conn.cursor()
+
+    codigo1 = request.form['codigo1']
+    codigo2 = request.form['codigo2']
+    valor = request.form['valor']
+    valor = valor.replace('.', '').replace(',', '.')
+    valor = float(valor) * 100  # Convertendo para centavos
+
+    cursor.execute('SELECT * FROM contas WHERE codigo = ?', (codigo1,))
+    cont1 = cursor.fetchone()
+
+    cursor.execute('SELECT * FROM contas WHERE codigo = ?', (codigo2,))
+    cont2 = cursor.fetchone()
+
+    if not cont1:
+        resultado = "Conta de origem não encontrada."
+        conn.close()
+        return render_template('transfer.html', resultado=resultado)
+    elif not cont2:
+        resultado = "Conta de destino não encontrada."
+        conn.close()
+        return render_template('transfer.html', resultado=resultado)
+
+    saldo_origem = cont1['saldo']
+    saldo_destino = cont2['saldo']
+
+    if valor == 0:
+        resultado = "Valor nulo, transação cancelada."
+        return render_template('transfer.html', resultado=resultado)
+    elif valor > saldo_origem:
+        resultado = "Saldo insuficiente."
+        return render_template('transfer.html', resultado=resultado)
+    elif valor < 0:
+        resultado = "Coloque um valor válido."
+        return render_template('transfer.html', resultado=resultado)
+    elif valor < 1000: 
+        resultado = "Valor mínimo para transação é 10,00."
+        return render_template('transfer.html', resultado=resultado)
+    else:
+        saldo_origem -= valor
+        saldo_destino += valor
+
+        cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo_origem, codigo1))
+        cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo_destino, codigo2))
+        conn.commit()
+        conn.close()
+
+        resultado = f"Transação de {valor / 100:.2f} realizada com sucesso! Novo saldo na conta de origem ({cont1['nome']}): {saldo_origem / 100:.2f}. Novo saldo na conta de destino ({cont2['nome']}): {saldo_destino / 100:.2f}"
+        return render_template('transfer.html', resultado=resultado)
     
 
+@app.route('/deposito')
+def depositar():
+    return render_template('depositar.html')
 
+@app.route('/deposito', methods=['POST'])
+def realizar_deposito():
+    conn = get()
+    cursor = conn.cursor()
 
+    conta = request.form['conta']
+    valor = request.form['valor']
+    valor = valor.replace('.', '').replace(',', '.')
+    valor = float(valor) * 100  
 
+    cursor.execute('SELECT * FROM contas WHERE codigo = ?', (conta,))
+    cont = cursor.fetchone()
 
+    if not cont:
+        mensagem = "Conta não encontrada."
+        conn.close()
+        return render_template('depositar.html', mensagem=mensagem)
 
+    saldo = cont['saldo']
+    saldo += valor
+
+    cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo, conta))
+    conn.commit()
+    conn.close()
+
+    mensagem = f"Depósito de {valor / 100:.2f} realizado com sucesso! Novo saldo: {saldo / 100:.2f}"
+    return render_template('depositar.html', mensagem=mensagem)
+
+@app.route('/sacar')
+def sacar():
+    return render_template('sacar.html')
+
+@app.route('/sacar', methods=['POST'])
+def realizar_saque():
+    conn = get()
+    cursor = conn.cursor()
+
+    conta = request.form['conta']
+    valor = request.form['valor']
+    valor = valor.replace('.', '').replace(',', '.')
+    valor = float(valor) * 100  # Convertendo para centavos
+
+    cursor.execute('SELECT * FROM contas WHERE codigo = ?', (conta,))
+    cont = cursor.fetchone()
+
+    if not cont:
+        mensagem = "Conta não encontrada."
+        conn.close()
+        return render_template('sacar.html', mensagem=mensagem)
+
+    saldo = cont['saldo']
+    saldo -= valor
+
+    cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo, conta))
+    conn.commit()
+    conn.close()
+
+    mensagem = f"Saque de {valor / 100:.2f} realizado com sucesso! Novo saldo: {saldo / 100:.2f}"
+    return render_template('sacar.html', mensagem=mensagem)
 
 if __name__ == '__main__':
     app.run(debug=True)
