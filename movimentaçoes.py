@@ -24,12 +24,15 @@ def deposito():
     valor = float(request.form['valor'].replace(',', '.'))
 
     
-    cursor.execute('SELECT * FROM  contas WHERE codigo = ?', (codigo1))
+    cursor.execute('SELECT * FROM  capital WHERE codigo = ?', (codigo1))
+    contS1 = cursor.fetchone()
+    cursor.execute('SELECT * FROM  conta WHERE codigo = ?', (codigo1))
     cont1 = cursor.fetchone()
-    
 
     
-    cursor.execute('SELECT * FROM  contas WHERE codigo = ?', (codigo2))
+    cursor.execute('SELECT * FROM  capital WHERE codigo = ?', (codigo2))
+    contS2 = cursor.fetchone()
+    cursor.execute('SELECT * FROM  conta WHERE codigo = ?', (codigo2))
     cont2 = cursor.fetchone()
     
     
@@ -43,8 +46,8 @@ def deposito():
         conn.close()
         return render_template('transfer.html', resultado=resultado)
 
-    saldo_origem = cont1[3]
-    saldo_destino = cont2[3]
+    saldo_origem = contS1[1]
+    saldo_destino = contS2[1]
         #mensagem=f"Saldo na conta de origem {cont1[1]}: {saldo_origem:.2f}"
         #mensagem2= (f"Valor a ser transferido para {cont2[1]}: ").replace(',', '.')
         #return render_template('transfer.html', mensagem=mensagem, mensagem2=mensagem2)
@@ -70,8 +73,8 @@ def deposito():
         saldo_destino += valor
 
     
-        cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo_origem, codigo1))
-        cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo_destino, codigo2))
+        cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo_origem, codigo1))
+        cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo_destino, codigo2))
         conn.commit()
         conn.close()
 

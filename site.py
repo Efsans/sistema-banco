@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 import sqlite3
 import re
+from datetime import date
 
 app = Flask(__name__)
 
@@ -28,15 +29,30 @@ def pesquisar():
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM contas WHERE codigo = ?', (chack,))
     conta = cursor.fetchone()
+    cursor.execute('SELECT * FROM capital WHERE codigo = ?', (chack))
+    capital = cursor.fetchone()
+    cursor.execute('SELECT * FROM extrato WHERE codigo = ?', (chack))
+    extrato = cursor.fetchone()
     conn.close()
+
+    if extrato['tipo'] == 3:
+        tipo="saque"
+    if extrato['tipo'] == 2:
+        tipo="eposito"
+    if extrato['tipo'] == 1:
+        tipo="tranferencia"        
     
     if conta:
         resultado = {
             'codigo': conta['codigo'],
             'nome': conta['nome'],
             'telefone': conta['telefone'],
-            'saldo': f"{conta['saldo'] / 100:.2f}".replace('.', ','),
-        }
+            'saldo': f"{capital['saldo'] / 100:.2f}".replace('.', ','),
+            'valor':extrato['valor'],
+            'data':extrato['data'],
+            'destino':extrato['para'],
+            'tipo' : tipo
+    }
     else:
         resultado = "codigo não encontrado"
     
@@ -79,7 +95,9 @@ def cadastrar():
             break
         conn.close()
     
-    cursor.execute('INSERT INTO contas (codigo, nome, telefone, saldo) VALUES (?, ?, ?, ?)', (numero_gerado, nome, telefone, saldo))
+    cursor.execute('INSERT INTO contas (codigo, nome, telefone) VALUES (?, ?, ?)', (numero_gerado, nome, telefone))
+    conn.commit()
+    cursor.execute('INSERT INTO capital (codigo, saldo) VALUES (?, ?)', (numero_gerado, saldo))
     conn.commit()
     conn.close()
     
@@ -107,9 +125,13 @@ def transferir():
 
     cursor.execute('SELECT * FROM contas WHERE codigo = ?', (codigo1,))
     cont1 = cursor.fetchone()
+    cursor.execute('SELECT * FROM  capital WHERE codigo = ?', (codigo1))
+    contS1 = cursor.fetchone()
 
     cursor.execute('SELECT * FROM contas WHERE codigo = ?', (codigo2,))
     cont2 = cursor.fetchone()
+    cursor.execute('SELECT * FROM  capital WHERE codigo = ?', (codigo2))
+    contS2 = cursor.fetchone()
 
     if not cont1:
         resultado = "Conta de origem não encontrada."
@@ -120,8 +142,8 @@ def transferir():
         conn.close()
         return render_template('transfer.html', resultado=resultado)
 
-    saldo_origem = cont1['saldo']
-    saldo_destino = cont2['saldo']
+    saldo_origem = contS1['saldo']
+    saldo_destino = contS2['saldo']
 
     if valor == 0:
         resultado = "Valor nulo, transação cancelada."
@@ -138,9 +160,12 @@ def transferir():
     else:
         saldo_origem -= valor
         saldo_destino += valor
+        data = date.today()
+        dataF = data.strftime('%d/%m/%Y')
 
-        cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo_origem, codigo1))
-        cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo_destino, codigo2))
+        cursor.execute('INSERT INTO extrato (codigo, tipo, valor, data, para) VALUES (?, ?, ?, ?, ?)', (cont1[0], "1", valor, dataF, cont2[1]))
+        cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo_origem, codigo1))
+        cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo_destino, codigo2))
         conn.commit()
         conn.close()
 
@@ -162,7 +187,7 @@ def realizar_deposito():
     valor = valor.replace('.', '').replace(',', '.')
     valor = float(valor) * 100  
 
-    cursor.execute('SELECT * FROM contas WHERE codigo = ?', (conta,))
+    cursor.execute('SELECT * FROM capital WHERE codigo = ?', (conta,))
     cont = cursor.fetchone()
 
     if not cont:
@@ -172,8 +197,11 @@ def realizar_deposito():
 
     saldo = cont['saldo']
     saldo += valor
+    data = date.today()
+    dataF = data.strftime('%d/%m/%Y')
 
-    cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo, conta))
+    cursor.execute('INSERT INTO extrato (codigo, tipo, valor, data) VALUES (?, ?, ?, ?)', (cont[0], "2", valor, dataF))
+    cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo, conta))
     conn.commit()
     conn.close()
 
@@ -194,7 +222,7 @@ def realizar_saque():
     valor = valor.replace('.', '').replace(',', '.')
     valor = float(valor) * 100  # Convertendo para centavos
 
-    cursor.execute('SELECT * FROM contas WHERE codigo = ?', (conta,))
+    cursor.execute('SELECT * FROM capital WHERE codigo = ?', (conta,))
     cont = cursor.fetchone()
 
     if not cont:
@@ -204,8 +232,11 @@ def realizar_saque():
 
     saldo = cont['saldo']
     saldo -= valor
+    data = date.today()
+    dataF = data.strftime('%d/%m/%Y')
 
-    cursor.execute('UPDATE contas SET saldo = ? WHERE codigo = ?', (saldo, conta))
+    cursor.execute('INSERT INTO extrato (codigo, tipo, valor, data) VALUES (?, ?, ?, ?)', (cont[0], "3", valor, dataF))
+    cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo, conta))
     conn.commit()
     conn.close()
 

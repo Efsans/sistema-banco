@@ -38,7 +38,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        button {
+        .button {
             background-color: blue;
             color: aliceblue;
             cursor: pointer;
@@ -46,7 +46,7 @@
             border-radius: 50px;
             border-color: azure;
         }
-        button:hover {
+        .button:hover {
             background-color: rgb(0, 0, 0);
             color: white;
             border-color: white;
@@ -78,6 +78,9 @@
             width: auto;
             
         }
+        .hide{
+            display: none;
+        }
 
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -88,12 +91,12 @@
         $('.formR').mask('#.##0,00', {reverse: true});
         $('.formT').mask('(00) 00000-0000');
         $('.formC').mask('000000'); 
-
+        $("#extrato").click(function(){
+            $(".hide").slideToggle();
+            $(this).text($(this).text()==="Esconder Extrato"?"Mostrar Extrato":"Esconder Extrato");
+        });
     });
-
-
-    
-       
+     
     </script>
 </head>
 <body>
@@ -101,7 +104,7 @@
         <h2>Pesquisa de Conta</h2>
         <form action="/pesquisa" method="post">
             <input type="text" id="conta" name="conta" placeholder="Código da conta"  required><br>
-            <button type="submit">Pesquisar</button><br>
+            <button type="submit" class="button">Pesquisar</button><br>
             <a href="/" class="btn btn-light">Voltar ao Menu</a>
         </form>
         {% if resultado %}
@@ -123,6 +126,21 @@
                         <td>{{ resultado.nome }}</td>
                         <td class="formT" >{{ resultado.telefone }}</td>
                         <td class="formR" >{{ resultado.saldo }}</td>
+                    </tr>
+                </table>
+                <button id="extrato" class="btn btn-outline-secondary">Mostrar Extrato</button>
+                <table class="hide">
+                    <tr>
+                        <th>tipo de movimentação</th>
+                        <th>valor</th>
+                        <th>destino</th>
+                        <th>data da movimentação</th>
+                    </tr>
+                    <tr>
+                        <td>{{resultado.tipo}}</td>
+                        <td class="formR">{{resultado.valor}}</td>
+                        <td>{{resultado.destino}}</td>
+                        <td>{{resultado.data}}</td>
                     </tr>
                 </table>
             {% endif %}
