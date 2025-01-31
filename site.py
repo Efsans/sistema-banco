@@ -9,6 +9,10 @@ def get():
     conn.row_factory = sqlite3.Row
     return conn
 
+@app.template_filter('zfill')
+def zfill_filter(s, width=6):
+    return str(s).zfill(width)
+
 @app.route('/')
 def menu():
     return render_template('menu.html')

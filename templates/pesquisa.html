@@ -67,14 +67,18 @@
             font-size: 8px;
         }
         table, th, td {
-            border: 1px solid white;
+            border: 0 solid white;
+
     
         }
         th, td {
             padding: 8px;
             text-align: left;
+            white-space: nowrap;
+            width: auto;
             
         }
+
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
@@ -83,7 +87,7 @@
         $('#conta').mask('000000');
         $('.formR').mask('#.##0,00', {reverse: true});
         $('.formT').mask('(00) 00000-0000');
-        $('.formC').mask('00000', {reverse: true}); 
+        $('.formC').mask('000000'); 
 
     });
 
@@ -115,7 +119,7 @@
                     </tr>
                     
                     <tr>
-                        <td class="formC">{{ resultado.codigo }}</td>
+                        <td class="formC">{{ resultado.codigo | zfill(6)}}</td>
                         <td>{{ resultado.nome }}</td>
                         <td class="formT" >{{ resultado.telefone }}</td>
                         <td class="formR" >{{ resultado.saldo }}</td>
