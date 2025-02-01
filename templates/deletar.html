@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deletar Conta</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            color: #000000;
+        }
+    </style>
+</head>
+<script>
+    $(document).ready(function(){
+        $('#codigo').mask('000000');
+    });
+</script>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Deletar Conta</h2>
+        <form id="deleteForm" method="POST" action="/deletar">
+            <div class="form-group">
+                <label for="codigo">Código da Conta</label>
+                <input type="text" class="form-control" id="codigo" name="codigo" required>
+            </div>
+            <button type="submit" class="btn btn-danger btn-block">Deletar Conta</button>
+        </form>
+        {% if mensagem %}
+        <div class="alert alert-info mt-3" role="alert">
+            {{ mensagem }}
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

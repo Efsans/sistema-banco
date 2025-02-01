@@ -29,29 +29,30 @@ def pesquisar():
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM contas WHERE codigo = ?', (chack,))
     conta = cursor.fetchone()
-    cursor.execute('SELECT * FROM capital WHERE codigo = ?', (chack))
+    cursor.execute('SELECT * FROM capital WHERE codigo = ?', (chack,))
     capital = cursor.fetchone()
-    cursor.execute('SELECT * FROM extrato WHERE codigo = ?', (chack))
-    extrato = cursor.fetchone()
+    cursor.execute('SELECT * FROM extrato WHERE codigo = ?', (chack,))
+    extrato = cursor.fetchall()
     conn.close()
 
-    if extrato['tipo'] == 3:
-        tipo="saque"
-    if extrato['tipo'] == 2:
-        tipo="eposito"
-    if extrato['tipo'] == 1:
-        tipo="tranferencia"        
+    # if extrato['tipo'] == 3:
+    #      tipo="saque"
+    # if extrato['tipo'] == 2:
+    #      tipo="eposito"
+    # if extrato['tipo'] == 1:
+    #      tipo="tranferencia"        
     
     if conta:
-        resultado = {
+        resultado = {     
             'codigo': conta['codigo'],
             'nome': conta['nome'],
             'telefone': conta['telefone'],
             'saldo': f"{capital['saldo'] / 100:.2f}".replace('.', ','),
-            'valor':extrato['valor'],
-            'data':extrato['data'],
-            'destino':extrato['para'],
-            'tipo' : tipo
+            'extrato' : extrato,
+            # 'valor':extrato['valor'],
+            # 'data':extrato['data'],
+            # 'destino':extrato['para'],
+            # 'tipo' : tipo
     }
     else:
         resultado = "codigo não encontrado"
@@ -242,6 +243,30 @@ def realizar_saque():
 
     mensagem = f"Saque de {valor / 100:.2f} realizado com sucesso! Novo saldo: {saldo / 100:.2f}"
     return render_template('sacar.html', mensagem=mensagem)
+
+@app.route('/deletar')
+def deletar():
+    return render_template('deletar.html')
+   
+
+@app.route('/deletar', methods=['POST'])
+def deletar_conta():
+
+    codigo = request.form['codigo']
+    conn = get()
+    cursor = conn.cursor()
+
+    # Deletar registros relacionados ao código da conta
+    cursor.execute('DELETE FROM contas WHERE codigo = ?', (codigo,))
+    cursor.execute('DELETE FROM capital WHERE codigo = ?', (codigo,))
+    cursor.execute('DELETE FROM extrato WHERE codigo = ?', (codigo,))
+
+    conn.commit()
+    conn.close()
+
+    mensagem = f"Conta com código {codigo} e todos os registros relacionados foram deletados com sucesso."
+    return render_template('deletar.html', mensagem=mensagem)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

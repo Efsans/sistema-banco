@@ -136,12 +136,23 @@
                         <th>destino</th>
                         <th>data da movimentação</th>
                     </tr>
+                    {% for resultado in resultado.extrato %}
                     <tr>
-                        <td>{{resultado.tipo}}</td>
+                        <td>{% if resultado.tipo == 1 %}
+                            Transferência
+                        {% elif resultado.tipo == 2 %}
+                            Depósito
+                        {% elif resulatdo.tipo == 3 %}
+                            Saque
+                        {% else %}
+                            Desconhecido
+                        {% endif %}
+                        </td>
                         <td class="formR">{{resultado.valor}}</td>
                         <td>{{resultado.destino}}</td>
                         <td>{{resultado.data}}</td>
                     </tr>
+                    {% endfor %}
                 </table>
             {% endif %}
         </div>
