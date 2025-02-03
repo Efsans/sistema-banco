@@ -26,14 +26,14 @@
             /*width: 300px;*/
             margin: 50px auto;
             /*padding: 20px;*/
-            background-image: linear-gradient(50deg, rgb(240, 216, 216), rgb(255, 255, 255));
+            background-image: linear-gradient(50deg, #cfdef3, rgb(255, 255, 255));
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
             /*text-align: center;*/
         }
         body {
-            font-family: Arial, sans-serif;
-            background-image: linear-gradient(10deg, rgb(255, 255, 255), rgb(241, 233, 233));
+            font-family:'segoe UI', Arial, sans-serif, tahoma;
+            background-image: linear-gradient(135deg, #e0eafc, #cfdef3);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -57,9 +57,15 @@
             border-color: white; 
             border-radius: 10px;
             cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn {
+            transition: 0.5;
+            transform: scale(0.9);
         }
         button:hover {
             background-color: #000000;
+            transform: scale(1.05);
         }
         .mensagem {
             margin-top: 20px;
@@ -99,10 +105,12 @@
             <label for="deposito">Valor inicial de deposito:</label>
             <input type="text" id="deposito" name="deposito" placeholder="digite o valor do deposito" step="0.01" min="0.0" class="form-control"><br>
             <div class= "container text-center">
-                <button type="submit" class="btn btn-outline-danger">Cadastrar</button><br>
+                <button type="submit" class="btn btn-outline-info">Cadastrar</button><br>
             </div>
         </form>
-        <a href="/" class="btn btn-light">Voltar ao Menu</a>
+        <div class="text-center">
+        <a href="/" class="btn btn-light btn-sm">Voltar ao Menu</a>
+        </div>
     </div>
 </body>
 </html>

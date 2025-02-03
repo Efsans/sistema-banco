@@ -9,17 +9,18 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
     crossorigin="anonymous">
     <style>
+        
     
         .container-custom {
             width: 300px;
             margin: 50px auto;
             padding: 20px;
             background-color: #f0f0f0;
-            border-radius: 10px;
+            border-radius: 15px;
             text-align: center;
             top: -30px;
             position: relative;
-            box-shadow: 5px 2px 5px black;
+            box-shadow: 0px 4px 10px black;
         }
         body {
             font-family: Arial, sans-serif;
@@ -28,6 +29,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
         }
         a {
             display: block;
@@ -37,9 +39,13 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            font-weight: bold;
+            transition: 0.7s;
         }
         a:hover {
-            background-color: #670000;
+            background-color: #ffffff;
+            transform: scale(1.05);
+            color: #ff0000;
         }
         .logo {
             font-size: 4em;
@@ -62,12 +68,15 @@
             1px  10px 10px rgba(0,0,0,.2),
             1px 20px 20px rgba(0,0,0,.15);;
         }
+        h5{
+            font-family: "comic sans MS";
+        }
 
         
     </style>
 </head>
 <body class="d-flex flex-column align-items-center justify-content-center vh-100">
-    <h5 class="logo" >Banco Under</h5>
+    <h5 class="logo" >Banco N.e.X</h5>
     <div class="container-custom">
         <h2>Menu Principal</h2>
         <a href="/pesquisa">Pesquisa de Conta</a>

@@ -11,7 +11,7 @@
             box-sizing: border-box;
         }
         .container {
-            width: 400px;
+            width: 500px;
             margin: 50px auto;
             padding: 20px;
             background-image: linear-gradient(50deg, rgb(230, 234, 247), rgb(214, 221, 255));
@@ -134,7 +134,7 @@
                         <th>tipo de movimentação</th>
                         <th>valor</th>
                         <th>destino</th>
-                        <th>data da movimentação</th>
+                        <th>data movimentação</th>
                     </tr>
                     {% for resultado in resultado.extrato %}
                     <tr>
@@ -148,7 +148,7 @@
                             Desconhecido
                         {% endif %}
                         </td>
-                        <td class="formR">{{resultado.valor}}</td>
+                        <td class="formR">{{ resultado.valor }}</td>
                         <td>{% if resultado.tipo == 1 %}
                             {{ resultado.para }}
                         {% elif resultado.tipo == 2 %}

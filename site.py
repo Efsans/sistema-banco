@@ -208,6 +208,10 @@ def realizar_deposito():
         conn.close()
         return render_template('depositar.html', mensagem=mensagem)
 
+    if valor <= 0:
+        mensagem = "valor invalido"
+        return render_template('depositar.html', mensagem=mensagem)
+        
     saldo = cont['saldo']
     saldo += valor
     data = date.today()
@@ -244,17 +248,62 @@ def realizar_saque():
         return render_template('sacar.html', mensagem=mensagem)
 
     saldo = cont['saldo']
-    saldo -= valor
-    data = date.today()
-    dataF = data.strftime('%d/%m/%Y')
+    if valor <= 0:
+        mensagem="valor de saque invalido"
 
-    cursor.execute('INSERT INTO extrato (codigo, tipo, valor, data) VALUES (?, ?, ?, ?)', (cont[0], "3", valor, dataF))
-    cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo, conta))
-    conn.commit()
-    conn.close()
+        return render_template('sacar.html', mensagem=mensagem)
 
-    mensagem = f"Saque de {valor / 100:.2f} realizado com sucesso! Novo saldo: {saldo / 100:.2f}"
-    return render_template('sacar.html', mensagem=mensagem)
+    if saldo >= 1000000:
+        if valor >= 200000:
+            taxa=valor*0.02
+            saldo -= valor
+            data = date.today()
+            dataF = data.strftime('%d/%m/%Y')
+
+            cursor.execute('INSERT INTO extrato (codigo, tipo, valor, data) VALUES (?, ?, ?, ?)', (cont[0], "3", valor, dataF))
+            cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo, conta))
+            conn.commit()
+            conn.close()
+
+            mensagem= f"Saque de {valor / 100:.2f} realizado com sucesso! taxa do saque: {taxa / 100:.2f} . Novo saldo: {saldo / 100:.2f}"
+
+            return render_template('sacar.html', mensagem=mensagem)
+        else:
+
+            if valor <= saldo:
+                saldo -= valor
+                data = date.today()
+                dataF = data.strftime('%d/%m/%Y')
+
+                cursor.execute('INSERT INTO extrato (codigo, tipo, valor, data) VALUES (?, ?, ?, ?)', (cont[0], "3", valor, dataF))
+                cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo, conta))
+                conn.commit()
+                conn.close()
+
+                mensagem = f"Saque de {valor / 100:.2f} realizado com sucesso! Novo saldo: {saldo / 100:.2f}"
+            else:
+                mensagem="saldo para saque insuficiente"
+
+            return render_template('sacar.html', mensagem=mensagem)        
+    
+    else:
+
+        if valor <= saldo:
+            saldo -= valor
+            data = date.today()
+            dataF = data.strftime('%d/%m/%Y')
+
+            cursor.execute('INSERT INTO extrato (codigo, tipo, valor, data) VALUES (?, ?, ?, ?)', (cont[0], "3", valor, dataF))
+            cursor.execute('UPDATE capital SET saldo = ? WHERE codigo = ?', (saldo, conta))
+            conn.commit()
+            conn.close()
+
+            mensagem = f"Saque de {valor / 100:.2f} realizado com sucesso! Novo saldo: {saldo / 100:.2f}"
+            
+        else:
+            mensagem="saldo para saque insuficiente"    
+    
+        return render_template('sacar.html', mensagem=mensagem)
 
 @app.route('/deletar')
 def deletar():
