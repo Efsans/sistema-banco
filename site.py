@@ -62,15 +62,21 @@ def pesquisar():
 def gerar_numero_sequencial():
     conn = get()
     cursor = conn.cursor()
-    cursor.execute('SELECT MAX(codigo) FROM contas')
-    max_codigo = cursor.fetchone()[0]
+    cursor.execute('SELECT codigo FROM contas ORDER BY codigo')
+    codigos = [row[0] for row in cursor.fetchall()]
     conn.close()
-    if max_codigo is None:
-        return str('000001')
-    else:
-        max_codigo = int(max_codigo)
-        return f"{int(max_codigo) + 1:06d}"
+    
+    if not codigos:
+        return 1
 
+    for i in range(1, len(codigos)+1):
+        if i !=int(codigos[i-1]):
+            return i
+        
+    
+    return len(codigos) + 1
+       
+        #return numero_gerado
 @app.route('/cadastro')
 def cadastro():
     return render_template('cadastro.html')
@@ -88,21 +94,27 @@ def cadastrar():
         saldo = int(saldo)
     
     while True:
-        numero_gerado = str(gerar_numero_sequencial())
+        numero_gerado = gerar_numero_sequencial()
         conn = get()
         cursor = conn.cursor()
         cursor.execute('SELECT 1 FROM contas WHERE codigo = ?', (numero_gerado,))
         if cursor.fetchone() is None:
             break
         conn.close()
+
+    # print(f"codigo: {numero_gerado} (tipo: {type(numero_gerado)})")
+    # print(f"nome: {nome} (tipo: {type(nome)})")
+    # print(f"telefone: {telefone} (tipo: {type(telefone)})")    
     
     cursor.execute('INSERT INTO contas (codigo, nome, telefone) VALUES (?, ?, ?)', (numero_gerado, nome, telefone))
     conn.commit()
     cursor.execute('INSERT INTO capital (codigo, saldo) VALUES (?, ?)', (numero_gerado, saldo))
     conn.commit()
     conn.close()
+
     
-    mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado}." #Guarde bem esse número pois por falta de conhecimento e tempo não foi emplementado sistema de login, então para que você possa usar bem a sua conta no nosso banco anote o numero. :) XD :v"
+    
+    mensagem = f"Cadastro feito com sucesso! Número da conta: {numero_gerado:06d}." #Guarde bem esse número pois por falta de conhecimento e tempo não foi emplementado sistema de login, então para que você possa usar bem a sua conta no nosso banco anote o numero. :) XD :v"
     return render_template('cadastro.html', mensagem=mensagem)
 
 @app.route("/mov")

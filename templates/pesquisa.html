@@ -142,14 +142,23 @@
                             Transferência
                         {% elif resultado.tipo == 2 %}
                             Depósito
-                        {% elif resulatdo.tipo == 3 %}
+                        {% elif resultado.tipo == 3 %}
                             Saque
                         {% else %}
                             Desconhecido
                         {% endif %}
                         </td>
                         <td class="formR">{{resultado.valor}}</td>
-                        <td>{{resultado.destino}}</td>
+                        <td>{% if resultado.tipo == 1 %}
+                            {{ resultado.para }}
+                        {% elif resultado.tipo == 2 %}
+                            depositado na conta
+                        {% elif resultado.tipo == 3 %}
+                            Retirado pelo Cliente 
+                        {% else %}
+                            N/A
+                        {% endif %}</td>
+
                         <td>{{resultado.data}}</td>
                     </tr>
                     {% endfor %}
