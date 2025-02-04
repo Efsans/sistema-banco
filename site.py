@@ -5,6 +5,7 @@ from datetime import date
 
 app = Flask(__name__)
 
+
 def get():
     conn = sqlite3.connect('contas.db')
     conn.row_factory = sqlite3.Row
